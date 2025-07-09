@@ -57,6 +57,8 @@ import {
 } from 'react-native';
 
 export default function TonePicker({ tones, selectedTone, onToneChange }) {
+  if (!tones || tones.length === 0) return null;
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
