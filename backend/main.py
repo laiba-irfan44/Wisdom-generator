@@ -47,6 +47,8 @@ async def generate_wisdom(data: QuestionInput):
         response = await client.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers)
 
     result = response.json()
+    print("OpenRouter key loaded:", OPENROUTER_API_KEY[:6] + "...")
+
     print("🔍 OpenRouter full response:", result)
 
     if "choices" not in result:
