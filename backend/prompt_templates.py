@@ -8,6 +8,8 @@ def generate_prompt(question: str, tone: str) -> str:
         "islamic": "Respond using Islamic teachings, quoting relevant Quranic wisdom or Hadith if appropriate.",
         "therapist": "Be empathetic, calm, and analytical — like a cognitive behavioral therapist.",
         "grandma": "Respond like a loving, wise grandmother who has seen it all, using warm and nostalgic language.",
+        "educational": "Answer like a clear, knowledgeable teacher—explain thoughtfully using simple and structured language.",
+    "technological": "Respond like a tech-savvy expert, using analogies from modern technology, innovation, or AI."
     }
 
     tone_instruction = tone_prompts.get(tone.lower(), "Use a calm and comforting tone.")
