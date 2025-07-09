@@ -6,10 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Switch,
 } from 'react-native';
-import { getWisdom, getToneOptions ,analyzeEmotion} from '../lib/api';
+import { getWisdom, getToneOptions, analyzeEmotion } from '../lib/api';
 import TonePicker from '../components/TonePicker';
-import { Switch } from 'react-native';
 
 const emotionToTone = {
   sad: 'spiritual',
@@ -25,8 +28,7 @@ export default function HomeScreen({ navigation }) {
   const [tone, setTone] = useState('');
   const [tones, setTones] = useState([]);
   const [loading, setLoading] = useState(false);
-const [autoDetectTone, setAutoDetectTone] = useState(true);
-
+  const [autoDetectTone, setAutoDetectTone] = useState(true);
 
   useEffect(() => {
     const fetchTones = async () => {
@@ -37,17 +39,15 @@ const [autoDetectTone, setAutoDetectTone] = useState(true);
     fetchTones();
   }, []);
 
+  useEffect(() => {
+    if (!autoDetectTone) return;
 
-useEffect(() => {
-  if (!autoDetectTone) return;
+    const timeout = setTimeout(() => {
+      if (question.trim()) handleAutoDetectTone();
+    }, 1000);
 
-  const timeout = setTimeout(() => {
-    if (question.trim()) handleAutoDetectTone();
-  }, 1000);
-
-  return () => clearTimeout(timeout);
-}, [question, autoDetectTone]);
-
+    return () => clearTimeout(timeout);
+  }, [question, autoDetectTone]);
 
   const handleAutoDetectTone = async () => {
     try {
@@ -58,7 +58,6 @@ useEffect(() => {
       console.log("Tone detection error", err);
     }
   };
-
 
   const handleAsk = async () => {
     if (!question.trim()) return;
@@ -74,43 +73,64 @@ useEffect(() => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>What’s on your mind?</Text>
-      <TextInput
-        placeholder="Ask your question..."
-        style={styles.input}
-        value={question}
-        onChangeText={setQuestion}
-        multiline
-      />
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>What’s on your mind?</Text>
 
-            <View style={styles.toggleContainer}>
-        <Text style={styles.toggleLabel}>Auto Detect Tone</Text>
-        <Switch value={autoDetectTone} onValueChange={setAutoDetectTone} />
+        <TextInput
+          placeholder="Ask your question..."
+          style={styles.input}
+          value={question}
+          onChangeText={setQuestion}
+          multiline
+        />
+
+        <View style={styles.toggleContainer}>
+          <Text style={styles.toggleLabel}>Auto Detect Tone</Text>
+          <Switch value={autoDetectTone} onValueChange={setAutoDetectTone} />
+        </View>
+
+        {autoDetectTone && tone !== '' && (
+          <Text style={styles.detectedTone}>🎯 Detected Tone: {tone}</Text>
+        )}
+
+        {!autoDetectTone && (
+          <>
+            <Text style={styles.toneLabel}>Pick a Tone</Text>
+            <TonePicker tones={tones} selectedTone={tone} onToneChange={setTone} />
+          </>
+        )}
+
+        <View style={{ height: 30 }} />
+      </ScrollView>
+
+      <View style={styles.footer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#007AFF" />
+        ) : (
+          <TouchableOpacity style={styles.askButton} onPress={handleAsk}>
+            <Text style={styles.askButtonText}>Ask Wisdom</Text>
+          </TouchableOpacity>
+        )}
       </View>
-
-      {autoDetectTone && tone && (
-        <Text style={styles.detectedTone}>Detected Tone: {tone}</Text>
-      )}
-
-      {!autoDetectTone && (
-        <TonePicker tones={tones} selectedTone={tone} onToneChange={setTone} />
-      )}
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
-      ) : (
-        <TouchableOpacity style={styles.askButton} onPress={handleAsk}>
-          <Text style={styles.askButtonText}>Ask Wisdom</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, flex: 1, justifyContent: 'center', backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#333' },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 60,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -120,8 +140,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     minHeight: 80,
     marginBottom: 20,
+    textAlignVertical: 'top',
   },
-   toggleContainer: {
+  toggleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
@@ -134,12 +155,23 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginBottom: 10,
     color: '#555',
+    fontSize: 14,
+  },
+  toneLabel: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: '#eee',
+    backgroundColor: '#fff',
   },
   askButton: {
     backgroundColor: '#007AFF',
     paddingVertical: 14,
     borderRadius: 10,
-    marginTop: 10,
   },
   askButtonText: {
     color: '#fff',
