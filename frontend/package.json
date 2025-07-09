@@ -3,8 +3,8 @@
   "main": "node_modules/expo/AppEntry.js",
   "version": "1.0.0",
   "scripts": {
-     "build": "expo export:web",
-  "start": "expo start --web",
+     "build": "expo export --platform web",
+  "start": "expo start",
     
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
