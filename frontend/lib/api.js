@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://192.168.18.149:8000', // or local IP if on mobile
+  baseURL:'https://wisdom-generator.onrender.com/'
 });
 
 // 👇 This is your wrapper for /generate-wisdom/
