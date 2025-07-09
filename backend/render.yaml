@@ -2,8 +2,10 @@ services:
   - type: web
     name: wisdom-backend
     env: python
+    plan: free
     buildCommand: ""
     startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    rootDir: backend
     envVars:
       - key: OPENROUTER_API_KEY
-        value: your-key-here
+        value: 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
